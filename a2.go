@@ -10,9 +10,9 @@ import (
 	"strings"
 )
 
-type Tokens [][]byte
+type tokens [][]byte
 
-func HTMLSpecialCharacter(c byte) ([]byte, bool) {
+func htmlSpecialCharacter(c byte) ([]byte, bool) {
 	switch c {
 	case '&':
 		return []byte("&amp;"), true
@@ -29,12 +29,12 @@ func HTMLSpecialCharacter(c byte) ([]byte, bool) {
 	}
 }
 
-func (t Tokens) convertSpecialCharactersToHTML() {
+func (t tokens) convertSpecialCharactersToHTML() {
 	for i := range t {
 		if t[i][0] == '"' {
 			var temp []byte
 			for j := range t[i] {
-				if seq, specialChar := HTMLSpecialCharacter(t[i][j]); specialChar {
+				if seq, specialChar := htmlSpecialCharacter(t[i][j]); specialChar {
 					temp = append(temp, seq...)
 				} else {
 					temp = append(temp, t[i][j])
@@ -111,7 +111,7 @@ func numSequence(b []byte) ([]byte, int) {
 	return result, len(result)
 }
 
-func parseJSON(b []byte) (t Tokens) {
+func parseJSON(b []byte) (t tokens) {
 	var seq []byte
 	openArrays := []int{0}
 	openArraysIndex := 0
@@ -169,7 +169,7 @@ func openPTag(indent int) string {
 	return strings.Join(pTag, "")
 }
 
-func HTMLSpecialCharacterString(b []byte) (string, int) {
+func htmlSpecialCharacterString(b []byte) (string, int) {
 	var result []byte
 	for i := range b {
 		result = append(result, b[i])
@@ -194,7 +194,7 @@ func spanTag(b []byte, color string, isString bool) string {
 				sTag = append(sTag, "\">")
 				if b[i+1] == '&' {
 					var str string
-					str, offset = HTMLSpecialCharacterString(b[i:])
+					str, offset = htmlSpecialCharacterString(b[i:])
 					sTag = append(sTag, str)
 				} else {
 					sTag = append(sTag, string(b[i:i+2]))
@@ -223,7 +223,7 @@ func spanTag(b []byte, color string, isString bool) string {
 	return strings.Join(sTag, "")
 }
 
-func convertToHTML(t Tokens) string {
+func convertToHTML(t tokens) string {
 	t.convertSpecialCharactersToHTML()
 	html := []string{"<!DOCTYPE html><html><body>"}
 	var color string
