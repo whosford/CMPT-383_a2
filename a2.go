@@ -207,12 +207,12 @@ func spanTag(b []byte, color string, isString bool) string {
 		}
 	} else {
 		str := string(b)
-		switch {
-		case str == ":":
+		switch str {
+		case ":":
 			sTag = append(sTag, " ")
 			sTag = append(sTag, str)
 			sTag = append(sTag, " ")
-		case str == ",":
+		case ",":
 			sTag = append(sTag, str)
 			sTag = append(sTag, " ")
 		default:
