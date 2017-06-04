@@ -50,7 +50,7 @@ func (t tokens) convertSpecialCharactersToHTML() {
 func readJSONFromFile(filename string) ([]byte, bool) {
 	buf, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatalf("Error (function 'getJSONFileText') %v", err)
+		log.Fatalf("Error (function 'readJSONFromFile') %v", err)
 	}
 	return buf, len(buf) == 0
 }
