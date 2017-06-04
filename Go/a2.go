@@ -12,6 +12,8 @@ import (
 
 type tokens [][]byte
 
+var indentAmount int = 25
+
 func htmlSpecialCharacter(c byte) ([]byte, bool) {
 	switch c {
 	case '&':
@@ -162,6 +164,24 @@ func parseJSON(b []byte) (t tokens) {
 	return t
 }
 
+func goToNewLine(a []byte) (bool, int) {
+	switch a[0] {
+	case '[':
+		return true, indentAmount
+	case ',':
+		return true, 0
+	default:
+		return false, 0
+	}
+}
+
+func closePTag(a []byte, b []byte) bool {
+	if a[1] == 'a' && b[0] != '}' {
+		return false
+	}
+	return true
+}
+
 func openPTag(indent int) string {
 	pTag := []string{"<p style=\"text-indent:"}
 	pTag = append(pTag, strconv.Itoa(indent))
@@ -225,7 +245,7 @@ func spanTag(b []byte, color string, isString bool) string {
 
 func convertToHTML(t tokens) string {
 	t.convertSpecialCharactersToHTML()
-	html := []string{"<!DOCTYPE html><html><body>"}
+	html := []string{"<!DOCTYPE html><html><body><style type=\"text/css\">p {margin:0} </style>"}
 	var color string
 	var isString bool
 	indent := 0
@@ -234,24 +254,22 @@ func convertToHTML(t tokens) string {
 		switch t[i][0] {
 		case '{':
 			color = "#0E0B16"
-			if i == 0 {
-				html = append(html, openPTag(indent))
-				html = append(html, spanTag(t[i], color, isString))
+			if i > 0 {
+				if newLine, increaseIndent := goToNewLine(t[i-1]); newLine {
+					indent += increaseIndent
+					html = append(html, openPTag(indent))
+				}
 			} else {
-				html = append(html, spanTag(t[i], color, isString))
+				html = append(html, openPTag(indent))
 			}
+			html = append(html, spanTag(t[i], color, isString))
+			indent += indentAmount
 			html = append(html, "</p>")
-			indent += 40
 			html = append(html, openPTag(indent))
 		case '}':
 			color = "#0E0B16"
-			indent -= 40
-			html = append(html, "</p>")
-			html = append(html, openPTag(indent))
+			indent -= indentAmount
 			html = append(html, spanTag(t[i], color, isString))
-			if i == len(t)-1 || (t[i+1][0] != ',' && t[i-1][0] != ']') {
-				html = append(html, "</p>")
-			}
 		case '&':
 			color = "#007849"
 			isString = true
@@ -262,7 +280,7 @@ func convertToHTML(t tokens) string {
 		case ',':
 			color = "#666633"
 			html = append(html, spanTag([]byte{t[i][0]}, color, isString))
-			if t[i][1] != 'a' {
+			if i > 0 && closePTag(t[i], t[i-1]) {
 				html = append(html, "</p>")
 				html = append(html, openPTag(indent))
 			}
