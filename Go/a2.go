@@ -55,8 +55,8 @@ func readJSONFromFile(filename string) ([]byte, bool) {
 	return buf, len(buf) == 0
 }
 
-func writeHTMLToFile(s string, outputFile string) {
-	f, err := os.Create(outputFile)
+func writeHTMLToFile(s string, outputFileName string) {
+	f, err := os.Create(outputFileName)
 	if err != nil {
 		log.Fatalf("Error (function 'writeHTMLToFile') %v", err)
 	}
@@ -306,7 +306,8 @@ func main() {
 	} else {
 		jsonTokens := parseJSON(json)
 		html := convertToHTML(jsonTokens)
-		outputFile := "output.html"
-		writeHTMLToFile(html, outputFile)
+		outputFileName := "output.html"
+		writeHTMLToFile(html, outputFileName)
+		fmt.Print(html)
 	}
 }
