@@ -19,7 +19,7 @@
       }
     }
   },
-  "s \"test\"": [2, [-23, 102.332, -52.01e-355,-4752E23], {
+  "s \"test\"": [2, [-23, 102.332, -52.01e-355,-4752E23], "{key:val}", {
     "para": "A meta-markup language, used to create markup languages such as DocBook.",
     "GlossSee": "markup\\\\\\",
     "test": [1, 2, 3]
